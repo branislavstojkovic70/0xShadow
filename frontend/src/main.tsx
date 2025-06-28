@@ -11,6 +11,7 @@ import History from './pages/history';
 import Navbar from './components/navbar';
 import { PasswordProvider } from './context/password-context';
 import Auth from './pages/auth';
+import ImportSeed from './pages/import-seed';
 
 const router = createBrowserRouter([
 	{
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
 	{
 		path: "/seed",
 		element: <Seed />,
+	},
+	{
+		path: "/import-seed",
+		element: <ImportSeed />,
 	},
 ]);
 
