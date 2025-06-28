@@ -10,6 +10,7 @@ import Send from './pages/send';
 import History from './pages/history';
 import Navbar from './components/navbar';
 import { PasswordProvider } from './context/password-context';
+import Auth from './pages/auth';
 
 const router = createBrowserRouter([
 	{
@@ -19,13 +20,17 @@ const router = createBrowserRouter([
 			{
 				path: "/",
 				element: (
-					<Send />
+					<Auth>
+						<Send />
+					</Auth>
 				),
 			},
 			{
 				path: "/history",
 				element: (
-					<History />
+					<Auth>
+						<History />
+					</Auth>
 				),
 			},
 		],
