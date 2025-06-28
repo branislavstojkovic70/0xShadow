@@ -9,6 +9,7 @@ import Home from './pages/home';
 import Send from './pages/send';
 import History from './pages/history';
 import Navbar from './components/navbar';
+import { PasswordProvider } from './context/password-context';
 
 const router = createBrowserRouter([
 	{
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
 	<ThemeProvider theme={theme}>
+		<PasswordProvider>
 			<CssBaseline />
 			<RouterProvider router={router} />
 			<Toaster
@@ -59,5 +61,6 @@ createRoot(document.getElementById("root")!).render(
 					},
 				}}
 			/>
+		</PasswordProvider>
 	</ThemeProvider>
 );
