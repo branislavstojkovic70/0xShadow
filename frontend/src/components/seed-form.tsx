@@ -18,9 +18,10 @@ import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { usePassword } from "../context/password-context";
-import { encryptMnemonic } from "../util/crypto";
+import { encryptMnemonic, generateStealthMetaAddress } from "../util/crypto";
 import { saveEncryptedMnemonic } from "../util/storage";
 import { useNavigate } from "react-router-dom";
+import { checkUsernameExists, registerUsername } from "../service/eth";
 
 const steps = [
 	"Backup Your Seed Phrase",
@@ -96,8 +97,17 @@ export default function SeedForm() {
 				);
 				await saveEncryptedMnemonic(encrypted, salt, iv);
 				setSessionPassword(values.password);
+				const stealthMetaAddress = await generateStealthMetaAddress(values.password);
+				const checkUserName = await checkUsernameExists(values.username);
+				if(checkUserName){
+					toast.error("Username already exists");
+					return
+				}
+				const tx = await registerUsername(values.username, stealthMetaAddress);
+				await tx.wait(); 
 				toast.success("Wallet successfully created!");
 				navigate("/");
+				
 			} catch (err) {
 				console.error(err);
 				toast.error("Failed to encrypt and save wallet.");
