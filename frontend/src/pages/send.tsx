@@ -1,7 +1,10 @@
 import { Container } from "@mui/material";
+import SendForm from "../components/send-form";
 
 export default function Send() {
-	return(
-		<Container>Hello from Send</Container>
-	)
+	return (
+		<Container maxWidth="sm" sx={{ mt: 5 }}>
+			<SendForm />
+		</Container>
+	);
 }

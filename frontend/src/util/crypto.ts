@@ -1,6 +1,7 @@
 import CryptoJS from "crypto-js";
-import { concat, getBytes, HDNodeWallet, hexlify, Mnemonic, SigningKey } from "ethers";
+import { concat, ethers, getBytes, HDNodeWallet, hexlify, Mnemonic, SigningKey } from "ethers";
 import { loadEncryptedMnemonic } from "./storage";
+import * as secp from "@noble/secp256k1";
 
 const KEY_SIZE = 256 / 32;
 const PBKDF2_ITERATIONS = 10000;
@@ -130,4 +131,22 @@ export async function generateStealthMetaAddress(
 	console.log("Stealth:", `st:eth:${stealthMeta}`);
 
 	return `${stealthMeta}`;
+}
+
+export async function deriveStealthAddress(spendingPub: string, sharedSecret: Uint8Array): Promise<string> {
+	const spendingPubBytes = ethers.getBytes(spendingPub);
+	const tweak = ethers.keccak256(sharedSecret);
+	const tweakBN = BigInt(tweak);
+	const pubPoint = secp.Point.fromHex(spendingPubBytes);
+	const stealthPoint = pubPoint.add(secp.Point.BASE.multiply(tweakBN));
+	const stealthPubCompressed = stealthPoint.toRawBytes(true);
+	const stealthAddress = ethers.computeAddress(ethers.hexlify(stealthPubCompressed));
+	return stealthAddress;
+}
+
+export async function getSharedSecret(ephemeralPriv: string, viewingPub: string): Promise<Uint8Array> {
+	const privBytes = ethers.getBytes(ephemeralPriv);
+	const pubBytes = ethers.getBytes(viewingPub);
+	const shared = secp.getSharedSecret(privBytes, pubBytes, true);
+	return shared.slice(1); 
 }

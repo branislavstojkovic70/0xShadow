@@ -169,6 +169,7 @@ export default function SeedForm() {
 									label={`Word #${i + 1}`}
 									type={isVisible ? "text" : "password"}
 									value={isEditable ? confirmWords[i] || "" : word}
+									//@ts-ignore
 									onChange={(e) => handleConfirmChange(i, e.target.value)}
 									InputProps={{
 										readOnly: !isEditable,
