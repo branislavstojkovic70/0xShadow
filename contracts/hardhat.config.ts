@@ -3,8 +3,15 @@ import "@nomicfoundation/hardhat-toolbox";
 import "./tasks/0xShadow";
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.30",
-
+  solidity:{
+    version:"0.8.30",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000
+      },
+    },
+  }, 
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545",

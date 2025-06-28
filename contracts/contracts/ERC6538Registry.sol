@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity 0.8.30;
 
-contract ERC6538Registry {
-    error ERC6538Registry__InvalidSignature();
+error ERC6538Registry__InvalidSignature();
 
+contract ERC6538Registry {
     mapping(address registrant => mapping(uint256 schemeId => bytes))
         public stealthMetaAddressOf;
-
     mapping(address registrant => uint256) public nonceOf;
+    mapping(string => bytes) public usernameToStealthMetaAddress;
+    mapping(address => string) public senderToUsername;
 
     bytes32 public constant ERC6538REGISTRY_ENTRY_TYPE_HASH =
         keccak256(
@@ -15,7 +16,6 @@ contract ERC6538Registry {
         );
 
     uint256 internal immutable INITIAL_CHAIN_ID;
-
     bytes32 internal immutable INITIAL_DOMAIN_SEPARATOR;
 
     event StealthMetaAddressSet(
@@ -23,8 +23,8 @@ contract ERC6538Registry {
         uint256 indexed schemeId,
         bytes stealthMetaAddress
     );
-
     event NonceIncremented(address indexed registrant, uint256 newNonce);
+    event UsernameRegistered(string indexed username, bytes stealthMetaAddress);
 
     constructor() {
         INITIAL_CHAIN_ID = block.chainid;
@@ -86,6 +86,27 @@ contract ERC6538Registry {
 
         stealthMetaAddressOf[registrant][schemeId] = stealthMetaAddress;
         emit StealthMetaAddressSet(registrant, schemeId, stealthMetaAddress);
+    }
+
+    function registerUsername(
+        address master,
+        string calldata username,
+        bytes calldata stealthMetaAddress
+    ) external {
+        require(bytes(username).length > 0, "Username required");
+        require(
+            usernameToStealthMetaAddress[username].length == 0,
+            "Username already taken"
+        );
+        senderToUsername[master] = username;
+        usernameToStealthMetaAddress[username] = stealthMetaAddress;
+        emit UsernameRegistered(username, stealthMetaAddress);
+    }
+
+    function usernameExists(
+        string calldata username
+    ) external view returns (bool) {
+        return usernameToStealthMetaAddress[username].length != 0;
     }
 
     function incrementNonce() external {
