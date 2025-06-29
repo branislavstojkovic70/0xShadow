@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, formatEther } from "ethers";
 import {
 	announcerAbi,
 	announcerAddress,
@@ -275,4 +275,54 @@ export async function sendFromStealthAddress(
 	}
 
 	sendFunds(to, amountInEth, stealthPrivKey);
+}
+
+
+export interface TxInfo {
+	hash: string;
+	to: string;
+	value: string;
+	timestamp: string;
+}
+
+
+export async function fetchTransactionsForAddress(
+	address: string,
+	blocksToScan: number = 1000
+): Promise<TxInfo[]> {
+	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+	const latestBlock = await provider.getBlockNumber();
+	const parsed: TxInfo[] = [];
+
+	for (let i = latestBlock; i >= Math.max(0, latestBlock - blocksToScan); i--) {
+		const block = await provider.getBlock(i, true);
+		if (!block || !block.prefetchedTransactions) continue;
+
+		for (const tx of block.prefetchedTransactions) {
+			if (
+				tx.from.toLowerCase() !== address.toLowerCase() ||
+				tx.value === 0n
+			)
+				continue;
+
+			parsed.push({
+				hash: tx.hash,
+				to: tx.to || "0x0",
+				value: parseFloat(formatEther(tx.value)).toFixed(5),
+				timestamp: new Date(Number(block.timestamp) * 1000).toLocaleString(
+					"en-GB",
+					{
+						day: "2-digit",
+						month: "2-digit",
+						year: "numeric",
+						hour: "2-digit",
+						minute: "2-digit",
+						hour12: false,
+					}
+				),
+			});
+		}
+	}
+
+	return parsed.reverse();
 }
