@@ -13,6 +13,7 @@ import { PasswordProvider } from "./context/password-context";
 import Auth from "./pages/auth";
 import ImportSeed from "./pages/import-seed";
 import Addresses from "./pages/addresses";
+import Login from "./pages/login";
 
 const router = createBrowserRouter([
 	{
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
 	{
 		path: "/home",
 		element: <Home />,
+	},
+	{
+		path: "/login",
+		element: <Login />,
 	},
 	{
 		path: "/seed",

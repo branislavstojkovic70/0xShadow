@@ -2,6 +2,7 @@ import {
 	Button,
 	Container,
 	Typography,
+	Stack,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -47,14 +48,25 @@ export default function Home() {
 				Choose how you want to access your wallet. You can import an existing one using a seed phrase or create a brand new wallet secured with a password.
 			</Typography>
 
-			<Button
-				variant="contained"
-				size="large"
-				onClick={() => navigate("/seed")}
-				sx={{ px: 4, py: 1.5, fontWeight: 600, fontSize: "1rem" }}
-			>
-				Create New Wallet
-			</Button>
+			<Stack spacing={3} direction={{ xs: "column", sm: "row" }} width="100%" justifyContent="center">
+				<Button
+					variant="outlined"
+					size="large"
+					onClick={() => navigate("/import-seed")}
+					sx={{ px: 4, py: 1.5, fontWeight: 600, fontSize: "1rem" }}
+				>
+					Import Existing Wallet
+				</Button>
+
+				<Button
+					variant="contained"
+					size="large"
+					onClick={() => navigate("/seed")}
+					sx={{ px: 4, py: 1.5, fontWeight: 600, fontSize: "1rem" }}
+				>
+					Create New Wallet
+				</Button>
+			</Stack>
 		</Container>
 	);
 }
