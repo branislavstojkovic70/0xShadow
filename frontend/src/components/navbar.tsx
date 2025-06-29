@@ -14,7 +14,14 @@ import {
 	useMediaQuery,
 } from "@mui/material";
 import { Outlet, useNavigate } from "react-router-dom";
-import { CallMade, Logout, Menu, History, LibraryBooks } from "@mui/icons-material";
+import {
+	CallMade,
+	Logout,
+	Menu,
+	History,
+	LibraryBooks,
+	Person,
+} from "@mui/icons-material";
 import { useState } from "react";
 export default function Navbar() {
 	const navigate = useNavigate();
@@ -27,6 +34,7 @@ export default function Navbar() {
 		{ label: "Send", icon: <CallMade />, path: "/" },
 		{ label: "Addresses", icon: <LibraryBooks />, path: "/addresses" },
 		{ label: "History", icon: <History />, path: "/history" },
+		{ label: "Profile", icon: <Person />, path: "/profile" },
 	];
 
 	return (

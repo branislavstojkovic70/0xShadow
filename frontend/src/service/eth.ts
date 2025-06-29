@@ -65,7 +65,6 @@ export async function getMasterWalletBalance(password: string): Promise<{
 	balance: string;
 }> {
 	const { master } = await generateKeyPairs(password);
-	console.log(master.address)
 	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
 	const balance = await provider.getBalance(master.address);
@@ -132,9 +131,6 @@ export async function sendFunds(
 		nonce: latestNonce,
 	});
 	await tx.wait();
-	console.log(
-		`Sent ${amountInEth} ETH to stealth address: ${stealthAddress}`
-	);
 
 	// 7. Announce ephemeral public key (compressed) and metadata
 	const announceContract = new ethers.Contract(
@@ -153,8 +149,6 @@ export async function sendFunds(
 		metadata
 	);
 	await annTx.wait();
-
-	console.log(`Announcement emitted for stealth address: ${stealthAddress}`);
 }
 
 export async function fetchMyStealthAnnouncements(): Promise<
@@ -277,7 +271,6 @@ export async function sendFromStealthAddress(
 	sendFunds(to, amountInEth, stealthPrivKey);
 }
 
-
 export interface TxInfo {
 	hash: string;
 	to: string;
@@ -325,4 +318,18 @@ export async function fetchTransactionsForAddress(
 	}
 
 	return parsed.reverse();
+}
+
+export async function getUsername(address: string): Promise<string> {
+	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+	const contract = new ethers.Contract(
+		registryAddress,
+		registryAbi,
+		provider
+	);
+
+	const username = await contract.senderToUsername(
+		ethers.getAddress(address)
+	);
+	return username;
 }

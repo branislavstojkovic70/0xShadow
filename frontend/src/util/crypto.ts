@@ -131,8 +131,6 @@ export async function generateStealthMetaAddress(
 		concat([getBytes(compressedSpending), getBytes(compressedViewing)])
 	);
 
-	console.log("Stealth:", `st:eth:${stealthMeta}`);
-
 	return `${stealthMeta}`;
 }
 

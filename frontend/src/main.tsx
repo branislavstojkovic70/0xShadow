@@ -14,6 +14,7 @@ import Auth from "./pages/auth";
 import ImportSeed from "./pages/import-seed";
 import Addresses from "./pages/addresses";
 import Login from "./pages/login";
+import Profile from "./pages/profile";
 
 const router = createBrowserRouter([
 	{
@@ -41,6 +42,14 @@ const router = createBrowserRouter([
 				element: (
 					<Auth>
 						<History />
+					</Auth>
+				),
+			},
+			{
+				path: "/profile",
+				element: (
+					<Auth>
+						<Profile />
 					</Auth>
 				),
 			},
