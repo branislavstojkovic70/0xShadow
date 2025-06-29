@@ -11,7 +11,12 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
-import { sendFunds, getMasterWalletBalance } from "../service/eth";
+import {
+	sendFunds,
+	getStealthAddressesWithBalance,
+	sendFromStealthAddress,
+	getMasterWalletBalance,
+} from "../service/eth";
 import { generateKeyPairs } from "../util/crypto";
 
 const validationSchema = Yup.object({
@@ -25,8 +30,9 @@ const validationSchema = Yup.object({
 interface SenderOption {
 	address: string;
 	label: string;
+	isStealth: boolean;
 	balance: number;
-	ephemeralPubKey?: string;
+	ephemeralPubKey?: string; // only for stealth
 }
 
 const ethFormatter = new Intl.NumberFormat("en", {
@@ -53,6 +59,7 @@ export default function SendForm() {
 				if (!password) return;
 
 				const keys = await generateKeyPairs(password);
+				const stealths = await getStealthAddressesWithBalance();
 				const masterBalanceResult = await getMasterWalletBalance(
 					password
 				);
@@ -62,8 +69,16 @@ export default function SendForm() {
 					{
 						address: keys.master.address,
 						label: `Master - ${keys.master.address}`,
+						isStealth: false,
 						balance: masterBalance,
 					},
+					...stealths.map((s) => ({
+						address: s.stealthAddress,
+						label: `Stealth - ${s.stealthAddress}`,
+						isStealth: true,
+						balance: parseFloat(s.balance),
+						ephemeralPubKey: s.ephermalPubKey,
+					})),
 				];
 
 				setSenderOptions(all);
@@ -103,11 +118,22 @@ export default function SendForm() {
 
 				const amountValue = values.amount.toString();
 
-				await sendFunds(
-					values.sendTo,
-					amountValue,
-					keyPairs.master.privateKey
-				);
+				if (!sender.isStealth) {
+					await sendFunds(
+						values.sendTo,
+						amountValue,
+						keyPairs.master.privateKey
+					);
+				} else {
+					if (!sender.ephemeralPubKey)
+						throw new Error("Missing ephemeral key");
+					await sendFromStealthAddress(
+						sender.ephemeralPubKey,
+						values.sendTo,
+						amountValue,
+						sender.address
+					);
+				}
 
 				toast.success(
 					`Sent ${ethFormatter.format(
@@ -147,6 +173,7 @@ export default function SendForm() {
 
 					<Divider />
 
+					{/* Select FROM + Balance */}
 					<Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
 						<TextField
 							fullWidth
@@ -198,6 +225,7 @@ export default function SendForm() {
 						/>
 					</Box>
 
+					{/* Recipient Username */}
 					<TextField
 						fullWidth
 						label="Recipient username"
@@ -215,6 +243,7 @@ export default function SendForm() {
 						disabled={loading}
 					/>
 
+					{/* Amount */}
 					<TextField
 						fullWidth
 						label="Amount"
@@ -252,6 +281,7 @@ export default function SendForm() {
 						}}
 					/>
 
+					{/* Network (read-only) */}
 					<TextField
 						fullWidth
 						label="Network"
@@ -260,6 +290,7 @@ export default function SendForm() {
 						disabled
 					/>
 
+					{/* Submit */}
 					<Button
 						type="submit"
 						variant="contained"

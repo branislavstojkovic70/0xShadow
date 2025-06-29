@@ -1,10 +1,13 @@
 import CryptoJS from "crypto-js";
-import { concat, ethers, getBytes, HDNodeWallet, hexlify, Mnemonic, SigningKey } from "ethers";
+import { concat, ethers, getBytes, HDNodeWallet, hexlify, keccak256, Mnemonic, SigningKey } from "ethers";
 import { loadEncryptedMnemonic } from "./storage";
 import * as secp from "@noble/secp256k1";
+import { secp256k1 } from "@noble/curves/secp256k1";
+import { mod } from "@noble/curves/abstract/modular";
 
 const KEY_SIZE = 256 / 32;
 const PBKDF2_ITERATIONS = 10000;
+const CURVE_ORDER = secp256k1.CURVE.n;
 
 export function deriveKey(
 	password: string,
@@ -149,4 +152,21 @@ export async function getSharedSecret(ephemeralPriv: string, viewingPub: string)
 	const pubBytes = ethers.getBytes(viewingPub);
 	const shared = secp.getSharedSecret(privBytes, pubBytes, true);
 	return shared.slice(1); 
+}
+
+export async function deriveStealthPrivateKey(
+	spendingPrivateKey: string,
+	viewingPrivateKey: string,
+	ephemeralPublicKey: string
+): Promise<string> {
+	const sharedSecret = await getSharedSecret(viewingPrivateKey, ephemeralPublicKey);
+
+	const sharedHash = keccak256(sharedSecret); 
+	const sharedBig = BigInt(sharedHash);
+	const spendingBig = BigInt(spendingPrivateKey);
+
+	const stealthPrivBig = mod(spendingBig + sharedBig, CURVE_ORDER);
+	const stealthPrivateKey = "0x" + stealthPrivBig.toString(16).padStart(64, "0");
+
+	return stealthPrivateKey;
 }

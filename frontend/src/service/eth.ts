@@ -7,6 +7,7 @@ import {
 } from "../config/contract-config";
 import {
 	deriveStealthAddress,
+	deriveStealthPrivateKey,
 	generateKeyPairs,
 	getSharedSecret,
 } from "../util/crypto";
@@ -252,4 +253,26 @@ export async function getStealthAddressesWithBalance(): Promise<
 	}
 
 	return addressesWithBalance;
+}
+
+export async function sendFromStealthAddress(
+	ephemeralPubKey: string,
+	to: string,
+	amountInEth: string,
+	stealthAddress: string
+): Promise<void> {
+	const password = sessionStorage.getItem("walletPassword");
+	if (!password) throw new Error("Missing password");
+	const { spending, viewing } = await generateKeyPairs(password);
+	const stealthPrivKey = await deriveStealthPrivateKey(
+		spending.privateKey,
+		viewing.privateKey,
+		ephemeralPubKey
+	);
+	const wallet = new ethers.Wallet(stealthPrivKey);
+	if (wallet.address !== stealthAddress) {
+		throw new Error("Mismatch in stealth address derivation");
+	}
+
+	sendFunds(to, amountInEth, stealthPrivKey);
 }
