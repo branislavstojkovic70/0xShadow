@@ -156,4 +156,100 @@ export async function sendFunds(
 	console.log(`Announcement emitted for stealth address: ${stealthAddress}`);
 }
 
+export async function fetchMyStealthAnnouncements(): Promise<
+	{
+		stealthAddress: string;
+		ephemeralPubKey: string;
+		txHash: string;
+	}[]
+> {
+	const password = sessionStorage.getItem("walletPassword");
+	if (!password) throw new Error("No wallet password in session");
 
+	const { spending, viewing } = await generateKeyPairs(password);
+
+	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+	const contract = new ethers.Contract(
+		announcerAddress,
+		announcerAbi,
+		provider
+	);
+
+	const filter = contract.filters.Announcement(VALID_SCHEME_ID.SCHEME_ID_1);
+	const logs = await contract.queryFilter(filter, 0, "latest");
+
+	const myAnnouncements: {
+		stealthAddress: string;
+		ephemeralPubKey: string;
+		txHash: string;
+	}[] = [];
+
+	for (const log of logs) {
+		try {
+			const parsed = contract.interface.parseLog(log);
+			const stealthAddress = parsed!.args.stealthAddress;
+			const ephemeralPubKey = parsed!.args.ephemeralPubKey;
+
+			// 1. derive shared secret
+			const sharedSecret = await getSharedSecret(
+				viewing.privateKey,
+				ephemeralPubKey
+			);
+
+			// 2. derive stealth address
+			const derivedStealth = await deriveStealthAddress(
+				spending.publicKey,
+				sharedSecret
+			);
+
+			// 3. check if this address matches
+			if (
+				ethers.getAddress(stealthAddress) ===
+				ethers.getAddress(derivedStealth)
+			) {
+				myAnnouncements.push({
+					stealthAddress: derivedStealth,
+					ephemeralPubKey,
+					txHash: log.transactionHash,
+				});
+			}
+		} catch (err) {
+			continue;
+		}
+	}
+
+	return myAnnouncements;
+}
+
+export async function getStealthAddressesWithBalance(): Promise<
+	{
+		stealthAddress: string;
+		balance: string;
+		txHash: string;
+		ephermalPubKey: string;
+	}[]
+> {
+	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+	const myAnnouncements = await fetchMyStealthAnnouncements();
+
+	const addressesWithBalance: {
+		stealthAddress: string;
+		balance: string;
+		txHash: string;
+		ephermalPubKey: string;
+	}[] = [];
+
+	for (const announcement of myAnnouncements) {
+		const balance = await provider.getBalance(announcement.stealthAddress);
+		if (balance > 0n) {
+			addressesWithBalance.push({
+				stealthAddress: announcement.stealthAddress,
+				balance: ethers.formatEther(balance),
+				txHash: announcement.txHash,
+				ephermalPubKey: announcement.ephemeralPubKey,
+			});
+		}
+	}
+
+	return addressesWithBalance;
+}

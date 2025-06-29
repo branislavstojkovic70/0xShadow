@@ -1,17 +1,18 @@
-import { createRoot } from 'react-dom/client'
+import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
-import './index.css'
+import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import theme from './theme';
-import Seed from './pages/seed';
-import Home from './pages/home';
-import Send from './pages/send';
-import History from './pages/history';
-import Navbar from './components/navbar';
-import { PasswordProvider } from './context/password-context';
-import Auth from './pages/auth';
-import ImportSeed from './pages/import-seed';
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import theme from "./theme";
+import Seed from "./pages/seed";
+import Home from "./pages/home";
+import Send from "./pages/send";
+import History from "./pages/history";
+import Navbar from "./components/navbar";
+import { PasswordProvider } from "./context/password-context";
+import Auth from "./pages/auth";
+import ImportSeed from "./pages/import-seed";
+import Addresses from "./pages/addresses";
 
 const router = createBrowserRouter([
 	{
@@ -23,6 +24,14 @@ const router = createBrowserRouter([
 				element: (
 					<Auth>
 						<Send />
+					</Auth>
+				),
+			},
+			{
+				path: "/addresses",
+				element: (
+					<Auth>
+						<Addresses />
 					</Auth>
 				),
 			},
