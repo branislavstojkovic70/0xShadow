@@ -18,6 +18,7 @@ import {
 	getMasterWalletBalance,
 } from "../service/eth";
 import { generateKeyPairs } from "../util/crypto";
+import { usePassword } from "../context/password-context";
 
 const validationSchema = Yup.object({
 	sendTo: Yup.string().required("Recipient username is required"),
@@ -50,18 +51,17 @@ export default function SendForm() {
 	const [selectedBalance, setSelectedBalance] = React.useState<number | null>(
 		null
 	);
+	const { password } = usePassword();
+
 
 	React.useEffect(() => {
 		(async () => {
 			try {
 				setLoadingAddresses(true);
-				const password = sessionStorage.getItem("walletPassword");
-				if (!password) return;
-
-				const keys = await generateKeyPairs(password);
-				const stealths = await getStealthAddressesWithBalance();
+				const keys = await generateKeyPairs(password!);
+				const stealths = await getStealthAddressesWithBalance(password!);
 				const masterBalanceResult = await getMasterWalletBalance(
-					password
+					password!
 				);
 				const masterBalance = parseFloat(masterBalanceResult.balance);
 
@@ -107,10 +107,9 @@ export default function SendForm() {
 		onSubmit: async (values) => {
 			setLoading(true);
 			try {
-				const password = sessionStorage.getItem("walletPassword");
-				if (!password) throw new Error("No password in session");
+				
 
-				const keyPairs = await generateKeyPairs(password);
+				const keyPairs = await generateKeyPairs(password!);
 				const sender = senderOptions.find(
 					(s) => s.address === selectedSender
 				);
@@ -131,7 +130,8 @@ export default function SendForm() {
 						sender.ephemeralPubKey,
 						values.sendTo,
 						amountValue,
-						sender.address
+						sender.address,
+						password!
 					);
 				}
 
@@ -214,8 +214,8 @@ export default function SendForm() {
 							value={
 								selectedBalance !== null
 									? `${ethFormatter.format(
-											selectedBalance
-									  )} ETH`
+										selectedBalance
+									)} ETH`
 									: "-"
 							}
 							InputProps={{ readOnly: true }}

@@ -38,24 +38,10 @@ export default function Login() {
 		onSubmit: async (values) => {
 			setLoading(true);
 			try {
-				const sessionPassword = sessionStorage.getItem("walletPassword") ?? "";
-
-				if (!sessionPassword) {
-					navigate("/seed");
-					return;
-				}
-
-				if (values.password !== sessionPassword) {
-					formik.setFieldError("password", "Incorrect password");
-					return;
-				}
-
 				const encryptedData = await loadEncryptedMnemonic();
-
 				if (!encryptedData) {
-					sessionStorage.setItem("walletPassword", values.password);
 					setPassword?.(values.password);
-					navigate("/import-seed");
+					navigate("/home");
 					return;
 				}
 

@@ -25,10 +25,11 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
 
 export async function registerUsername(
 	username: string,
-	stealthMetaAddress: string
+	stealthMetaAddress: string,
+	password:string,
 ): Promise<ethers.TransactionResponse> {
 	const { master } = await generateKeyPairs(
-		sessionStorage.getItem("walletPassword")!
+		password!
 	);
 	const signer = (await createSystemSigner()).signer;
 	const contract = new ethers.Contract(registryAddress, registryAbi, signer);
@@ -151,14 +152,13 @@ export async function sendFunds(
 	await annTx.wait();
 }
 
-export async function fetchMyStealthAnnouncements(): Promise<
+export async function fetchMyStealthAnnouncements(password:string): Promise<
 	{
 		stealthAddress: string;
 		ephemeralPubKey: string;
 		txHash: string;
 	}[]
 > {
-	const password = sessionStorage.getItem("walletPassword");
 	if (!password) throw new Error("No wallet password in session");
 
 	const { spending, viewing } = await generateKeyPairs(password);
@@ -216,7 +216,7 @@ export async function fetchMyStealthAnnouncements(): Promise<
 	return myAnnouncements;
 }
 
-export async function getStealthAddressesWithBalance(): Promise<
+export async function getStealthAddressesWithBalance(password:string): Promise<
 	{
 		stealthAddress: string;
 		balance: string;
@@ -225,7 +225,7 @@ export async function getStealthAddressesWithBalance(): Promise<
 	}[]
 > {
 	const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-	const myAnnouncements = await fetchMyStealthAnnouncements();
+	const myAnnouncements = await fetchMyStealthAnnouncements(password);
 
 	const addressesWithBalance: {
 		stealthAddress: string;
@@ -253,9 +253,9 @@ export async function sendFromStealthAddress(
 	ephemeralPubKey: string,
 	to: string,
 	amountInEth: string,
-	stealthAddress: string
+	stealthAddress: string,
+	password:string,
 ): Promise<void> {
-	const password = sessionStorage.getItem("walletPassword");
 	if (!password) throw new Error("Missing password");
 	const { spending, viewing } = await generateKeyPairs(password);
 	const stealthPrivKey = await deriveStealthPrivateKey(

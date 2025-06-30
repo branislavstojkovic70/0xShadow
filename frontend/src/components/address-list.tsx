@@ -12,6 +12,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import QRCode from "react-qr-code";
 import toast from "react-hot-toast";
 import { getStealthAddressesWithBalance } from "../service/eth";
+import { usePassword } from "../context/password-context";
 
 const ethFormatter = new Intl.NumberFormat("en", {
 	minimumFractionDigits: 2,
@@ -24,7 +25,8 @@ export default function AddressList() {
 	>([]);
 	const [loading, setLoading] = useState(true);
 	const [totalBalance, setTotalBalance] = useState<number>(0);
-
+	const { password } = usePassword();
+	
 	const handleCopy = async (address: string) => {
 		try {
 			await navigator.clipboard.writeText(address);
@@ -38,7 +40,7 @@ export default function AddressList() {
 		(async () => {
 			setLoading(true);
 			try {
-				const result = await getStealthAddressesWithBalance();
+				const result = await getStealthAddressesWithBalance(password!);
 				const parsed = result
 					.map((r) => ({
 						address: r.stealthAddress,

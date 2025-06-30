@@ -20,6 +20,7 @@ import {
     fetchTransactionsForAddress,
 } from "../service/eth";
 import { generateKeyPairs } from "../util/crypto";
+import { usePassword } from "../context/password-context";
 
 interface TxInfo {
     hash: string;
@@ -45,7 +46,7 @@ export default function TransactionList() {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-
+    const {password} = usePassword();
     const handleCopy = async (text: string) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -59,13 +60,12 @@ export default function TransactionList() {
         (async () => {
             setLoadingAddrs(true);
             try {
-                const password = sessionStorage.getItem("walletPassword");
-                if (!password) return;
 
-                const keys = await generateKeyPairs(password);
-                const stealths = await getStealthAddressesWithBalance();
+
+                const keys = await generateKeyPairs(password!);
+                const stealths = await getStealthAddressesWithBalance(password!);
                 const masterBalanceResult = await getMasterWalletBalance(
-                    password
+                    password!
                 );
                 const masterBalance = parseFloat(masterBalanceResult.balance);
 

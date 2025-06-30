@@ -103,7 +103,7 @@ export default function SeedForm() {
 					toast.error("Username already exists");
 					return
 				}
-				const tx = await registerUsername(values.username, stealthMetaAddress);
+				const tx = await registerUsername(values.username, stealthMetaAddress,values.password);
 				await tx.wait(); 
 				toast.success("Wallet successfully created!");
 				navigate("/");
