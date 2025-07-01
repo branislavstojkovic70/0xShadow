@@ -1,7 +1,10 @@
 import { Container } from "@mui/material";
+import TransactionList from "../components/transaction-list";
 
 export default function History() {
 	return(
-		<Container>Hello from History</Container>
+		<Container>
+			<TransactionList/>
+		</Container>
 	)
 }

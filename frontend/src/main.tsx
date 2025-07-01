@@ -1,14 +1,20 @@
-import { createRoot } from 'react-dom/client'
+import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
-import './index.css'
+import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import theme from './theme';
-import Seed from './pages/seed';
-import Home from './pages/home';
-import Send from './pages/send';
-import History from './pages/history';
-import Navbar from './components/navbar';
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import theme from "./theme";
+import Seed from "./pages/seed";
+import Home from "./pages/home";
+import Send from "./pages/send";
+import History from "./pages/history";
+import Navbar from "./components/navbar";
+import { PasswordProvider } from "./context/password-context";
+import Auth from "./pages/auth";
+import ImportSeed from "./pages/import-seed";
+import Addresses from "./pages/addresses";
+import Login from "./pages/login";
+import Profile from "./pages/profile";
 
 const router = createBrowserRouter([
 	{
@@ -18,13 +24,33 @@ const router = createBrowserRouter([
 			{
 				path: "/",
 				element: (
-					<Send />
+					<Auth>
+						<Send />
+					</Auth>
+				),
+			},
+			{
+				path: "/addresses",
+				element: (
+					<Auth>
+						<Addresses />
+					</Auth>
 				),
 			},
 			{
 				path: "/history",
 				element: (
-					<History />
+					<Auth>
+						<History />
+					</Auth>
+				),
+			},
+			{
+				path: "/profile",
+				element: (
+					<Auth>
+						<Profile />
+					</Auth>
 				),
 			},
 		],
@@ -34,13 +60,22 @@ const router = createBrowserRouter([
 		element: <Home />,
 	},
 	{
+		path: "/login",
+		element: <Login />,
+	},
+	{
 		path: "/seed",
 		element: <Seed />,
+	},
+	{
+		path: "/import-seed",
+		element: <ImportSeed />,
 	},
 ]);
 
 createRoot(document.getElementById("root")!).render(
 	<ThemeProvider theme={theme}>
+		<PasswordProvider>
 			<CssBaseline />
 			<RouterProvider router={router} />
 			<Toaster
@@ -59,5 +94,6 @@ createRoot(document.getElementById("root")!).render(
 					},
 				}}
 			/>
+		</PasswordProvider>
 	</ThemeProvider>
 );

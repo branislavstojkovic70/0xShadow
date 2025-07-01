@@ -1,10 +1,10 @@
 import { Container } from "@mui/material";
-import SendForm from "../components/send-form";
+import AddressList from "../components/address-list";
 
-export default function Send() {
+export default function Addresses() {
 	return (
 		<Container maxWidth="sm" sx={{ mt: 5 }}>
-			<SendForm />
+			<AddressList />
 		</Container>
 	);
 }

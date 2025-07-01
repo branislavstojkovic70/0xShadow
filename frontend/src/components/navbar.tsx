@@ -18,7 +18,9 @@ import {
 	CallMade,
 	Logout,
 	Menu,
-	History
+	History,
+	LibraryBooks,
+	Person,
 } from "@mui/icons-material";
 import { useState } from "react";
 export default function Navbar() {
@@ -28,10 +30,11 @@ export default function Navbar() {
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
-
 	const navItems = [
 		{ label: "Send", icon: <CallMade />, path: "/" },
+		{ label: "Addresses", icon: <LibraryBooks />, path: "/addresses" },
 		{ label: "History", icon: <History />, path: "/history" },
+		{ label: "Profile", icon: <Person />, path: "/profile" },
 	];
 
 	return (
