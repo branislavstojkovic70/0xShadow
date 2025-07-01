@@ -10,16 +10,16 @@ interface Props {
 export default function Auth({ children }: Props) {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
-	const {password} = usePassword();
+	const { password } = usePassword();
 	useEffect(() => {
 		const checkAccess = async () => {
-			if (!password) {
-				navigate("/login");
-				return;
-			}
 			const mnemonicData = await loadEncryptedMnemonic();
 			if (!mnemonicData) {
-				navigate("/seed");
+				navigate("/home");
+				return;
+			}
+			if (!password) {
+				navigate("/login");
 				return;
 			}
 			setLoading(false);
