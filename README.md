@@ -4,6 +4,9 @@ A privacy focused Ethereum wallet supporting ERC5564 stealth addresses for confi
 
 ---
 
+## App Demo
+[▶️ App Demo on YouTube](https://www.youtube.com/watch?v=deBNxwTUcmE)
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
