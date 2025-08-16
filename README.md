@@ -1,4 +1,9 @@
 # Stealth Wallet - 0xShadow - EthereumNS Hackathon Project
+<img src="./0xShadow.jpeg" alt="0xShadow" style="width:100%; height:auto;" />
+
+---
+
+## Overview
 
 A privacy focused Ethereum wallet supporting ERC5564 stealth addresses for confidential transactions. This project combines a React + TypeScript frontend with Solidity smart contracts to enable sending and receiving ETH through stealth addresses, offering enhanced privacy for blockchain users.
 
@@ -9,13 +14,17 @@ A privacy focused Ethereum wallet supporting ERC5564 stealth addresses for confi
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
-- [Tech Stack](#tech-stack)
-- [Installation & Usage](#installation--usage)
-  - [Frontend](#frontend)
-  - [Smart Contracts](#smart-contracts)
-- [Makefile Commands](#makefile-commands)
-- [Features](#features)
+- [Stealth Wallet - 0xShadow - EthereumNS Hackathon Project](#stealth-wallet---0xshadow---ethereumns-hackathon-project)
+  - [Overview](#overview)
+  - [App Demo](#app-demo)
+  - [Table of Contents](#table-of-contents)
+  - [Project Overview](#project-overview)
+  - [Tech Stack](#tech-stack)
+  - [Installation \& Usage](#installation--usage)
+    - [Frontend](#frontend)
+    - [Smart Contracts](#smart-contracts)
+  - [Makefile Commands](#makefile-commands)
+  - [Features](#features)
 
 ---
 
